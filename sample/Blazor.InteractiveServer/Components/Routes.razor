@@ -1,0 +1,16 @@
+﻿<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity != null)
+                {
+                    <p>Access Denied</p>
+                }
+                else
+                {
+                    <p>Cannot access this resource. Please <a href="/login">log in</a>.</p>
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
+    </Found>
+</Router>

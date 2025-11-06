@@ -1,0 +1,52 @@
+@using Microsoft.AspNetCore.Components.Forms
+@layout Blazor.InteractiveServer.Components.Layout.BlankLayout
+@page "/login"
+
+<h3>Login</h3>
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div role="alert">
+        @Message
+    </div>
+}
+<EditForm Model="@Payload" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div >
+        <label for="inputId" >User ID</label>
+        <InputText id="inputId" @bind-Value="Payload.Id" />
+    </div>
+    <div >
+        <label for="inputPassword" >Password</label>
+        <InputText id="inputPassword" type="password" @bind-Value="Payload.Password" />
+    </div>
+    <button type="submit" >Log In</button>
+</EditForm>
+
+@inject NavigationManager Navigation
+@inject IUserService<SignInPayload> UserService
+@code {
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Message { get; set; }
+
+    private SignInPayload Payload = new SignInPayload() {
+        Id = "",
+        Password = ""
+    };
+
+    private async Task HandleLogin()
+    {
+        var result = await UserService.SignInAsync(Payload);
+        if(result.IsSuccess)
+        {
+            Navigation.NavigateTo(ReturnUrl ?? "/", forceLoad: true, replace: true);
+        }
+        else
+        {
+            Navigation.NavigateTo($"/login?message={result.ErrorMessage}&returnUrl={ReturnUrl}", forceLoad: true, replace: true);
+        }
+    }
+}
